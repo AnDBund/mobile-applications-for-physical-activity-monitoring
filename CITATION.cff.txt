@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+authors:
+
+family-names: "Yefremenko"
+given-names: "Andrii"
+orcid: "https://orcid.org/0000-0003-0924-0281"
+title: "Mobile applications for physical activity monitoring (Комп'ютерна програма «Мобільні додатки для моніторингу рухової діяльності»)"
+version: 1.0.0
+date-released: 2026-11-08
+url: "https://github.com/AnDBund/mobile-applications-for-physical-activity-monitoring"

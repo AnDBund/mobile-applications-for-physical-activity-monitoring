@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мобільні додатки для моніторингу рухової діяльності | Інтерактивний мікрокурс</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#1d4ed8',
+              600: '#1e40af',
+              700: '#1d4ed8',
+              800: '#1e3a8a',
+              900: '#0f172a',
+            },
+            accent: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gradient-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #064e3b 100%);
+    }
+    .card-shadow {
+      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-accent-500 selection:text-white">
+
+  <!-- Спливаюче внутрішньосторінкове сповіщення (Toast) з резервним аудіо/візуальним сигналом -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 bg-slate-900/95 backdrop-blur-md text-white p-4 sm:p-5 rounded-2xl shadow-2xl flex items-start gap-3.5 transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/80 max-w-sm sm:max-w-md">
+    <div id="toastIconContainer" class="w-10 h-10 rounded-xl bg-accent-500/20 text-accent-400 flex items-center justify-center shrink-0 text-lg border border-accent-500/30">
+      <i id="toastIcon" class="fa-solid fa-bell"></i>
+    </div>
+    <div class="flex-1">
+      <h4 id="toastTitle" class="text-xs uppercase tracking-wider font-bold text-accent-400 mb-0.5">Освітнє сповіщення</h4>
+      <p id="toastMessage" class="text-xs sm:text-sm font-medium text-slate-200 leading-snug">Будь ласка, завершіть попередній етап для доступу.</p>
+    </div>
+  </div>
+
+  <!-- Смуга прогресу читання -->
+  <div id="scrollProgress" class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-brand-600 via-sky-500 to-accent-500 z-50 transition-all duration-150" style="width: 0%;"></div>
+
+  <!-- Фіксована панель навігації -->
+  <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-slate-200 z-40 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        <a href="#hero" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-800 to-accent-600 flex items-center justify-center text-white shadow-md shadow-brand-900/20 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-heart-pulse text-lg"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-accent-600 block">Мікрокурс для тренерів</span>
+            <span class="font-display font-bold text-base sm:text-lg text-slate-900 leading-tight">Моніторинг діяльності</span>
+          </div>
+        </a>
+
+        <!-- Десктопна навігація -->
+        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <a href="#module-1" class="px-3 py-2 rounded-lg text-xs lg:text-sm font-semibold text-slate-600 hover:text-brand-700 hover:bg-slate-100 transition-colors flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
+              <i id="nav-icon-1" class="fa-solid fa-check text-xs"></i>
+            </span>
+            Когнітивний базис
+          </a>
+          <a href="#module-2" id="nav-item-2" onclick="handleNavClick(event, 2)" class="px-3 py-2 rounded-lg text-xs lg:text-sm font-semibold text-slate-600 hover:text-brand-700 hover:bg-slate-100 transition-colors flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs">
+              <i id="nav-icon-2" class="fa-solid fa-lock text-xs"></i>
+            </span>
+            Методичний інструментарій
+          </a>
+          <a href="#module-3" id="nav-item-3" onclick="handleNavClick(event, 3)" class="px-3 py-2 rounded-lg text-xs lg:text-sm font-semibold text-slate-600 hover:text-brand-700 hover:bg-slate-100 transition-colors flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs">
+              <i id="nav-icon-3" class="fa-solid fa-lock text-xs"></i>
+            </span>
+            Кейс і Сертифікація
+          </a>
+        </nav>
+
+        <!-- Мобільна кнопка меню -->
+        <button id="mobileMenuBtn" aria-label="Відкрити меню навігації" class="md:hidden w-10 h-10 flex items-center justify-center text-slate-700 rounded-lg hover:bg-slate-100 focus:outline-none">
+          <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Мобільне меню -->
+    <div id="mobileMenu" class="hidden md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-4 space-y-2">
+      <a href="#module-1" class="mobile-nav-link block px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-brand-700">
+        <i class="fa-solid fa-video text-brand-600 mr-2 w-5"></i> Модуль 1: Когнітивний базис (Запам’ятовування та Розуміння)
+      </a>
+      <a href="#module-2" id="mob-nav-item-2" onclick="handleNavClick(event, 2)" class="mobile-nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-accent-700">
+        <span><i class="fa-solid fa-chart-line text-accent-600 mr-2 w-5"></i> Модуль 2: Методичний інструментарій</span>
+        <i id="mob-nav-icon-2" class="fa-solid fa-lock text-xs text-slate-400"></i>
+      </a>
+      <a href="#module-3" id="mob-nav-item-3" onclick="handleNavClick(event, 3)" class="mobile-nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700">
+        <span><i class="fa-solid fa-file-pen text-amber-600 mr-2 w-5"></i> Модуль 3: Практичний кейс і Сертифікація</span>
+        <i id="mob-nav-icon-3" class="fa-solid fa-lock text-xs text-slate-400"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- Головний екран (Hero) -->
+  <section id="hero" class="relative pt-24 sm:pt-28 pb-12 lg:pb-16 gradient-header text-white overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#34d399_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs sm:text-sm font-medium text-emerald-300 mb-6">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>Цифрова педагогіка та спортивна інноватика</span>
+      </div>
+
+      <div class="max-w-4xl">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight sm:leading-tight mb-6">
+          Мобільні додатки для моніторингу рухової діяльності
+        </h1>
+        <p class="text-base sm:text-xl text-slate-200 font-normal leading-relaxed max-w-3xl mb-8">
+          Спеціалізований прикладний мікрокурс для тренерів, фахівців фізичного виховання і спорту. Опануйте сенсорну архітектуру, валідовані протоколи польового моніторингу та правові норми захисту біометричних даних атлетів.
+        </p>
+
+        <!-- Траєкторія навчання за таксономією Блума -->
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-white/15">
+          <h2 class="text-xs uppercase tracking-widest text-emerald-300 font-semibold mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group"></i> Освітня траєкторія за переглянутою таксономією Бенджаміна Блума
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="bg-white/10 rounded-xl p-3.5 border border-white/10 flex items-start space-x-3">
+              <span class="w-7 h-7 rounded-lg bg-blue-500/30 text-blue-200 font-bold flex items-center justify-center shrink-0 text-sm">I</span>
+              <div>
+                <p class="text-xs text-blue-200 font-semibold uppercase">Рівні 1-2</p>
+                <p class="text-sm font-bold text-white">Запам'ятовування і Розуміння</p>
+                <p class="text-xs text-slate-300 mt-1">Інтерактивна відеоаналітика концепцій та сенсорних рівнів</p>
+              </div>
+            </div>
+            <div class="bg-white/10 rounded-xl p-3.5 border border-white/10 flex items-start space-x-3">
+              <span class="w-7 h-7 rounded-lg bg-emerald-500/30 text-emerald-200 font-bold flex items-center justify-center shrink-0 text-sm">II</span>
+              <div>
+                <p class="text-xs text-emerald-200 font-semibold uppercase">Рівні 3-4</p>
+                <p class="text-sm font-bold text-white">Застосування та Аналіз</p>
+                <p class="text-xs text-slate-300 mt-1">Методичний апарат, метрики навантаження, GDPR та automation bias</p>
+              </div>
+            </div>
+            <div class="bg-white/10 rounded-xl p-3.5 border border-white/10 flex items-start space-x-3">
+              <span class="w-7 h-7 rounded-lg bg-amber-500/30 text-amber-200 font-bold flex items-center justify-center shrink-0 text-sm">III</span>
+              <div>
+                <p class="text-xs text-amber-200 font-semibold uppercase">Рівні 5-6</p>
+                <p class="text-sm font-bold text-white">Оцінювання та Створення</p>
+                <p class="text-xs text-slate-300 mt-1">Експертний аналіз кейсу впровадження та підсумкова сертифікація</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="#module-1" class="px-6 py-3 rounded-xl bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm sm:text-base shadow-lg shadow-accent-700/30 transition-all flex items-center gap-2">
+            <span>Розпочати навчання</span>
+            <i class="fa-solid fa-arrow-down text-sm"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПАНЕЛЬ УПРАВЛІННЯ ПРОГРЕСОМ ТА СИСТЕМА ПІДТРИМКИ НАВЧАЛЬНОЇ МОТИВАЦІЇ -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
+    <div class="bg-white rounded-3xl p-5 sm:p-7 card-shadow border border-slate-200">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        
+        <!-- Ліва частина: Віджет трекера прогресу з чекбоксами -->
+        <div class="flex-1 w-full">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-emerald-100 text-accent-700 flex items-center justify-center text-sm font-bold">
+                <i class="fa-solid fa-bars-progress"></i>
+              </span>
+              <div>
+                <h3 class="font-display font-bold text-slate-900 text-sm sm:text-base">Трекер навчальної мотивації та прогресу</h3>
+                <p class="text-xs text-slate-500">Фіксуйте проходження рівнів таксономії Блума</p>
+              </div>
+            </div>
+            <span id="progressPercentBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-brand-700 border border-slate-200">
+              0% завершено
+            </span>
+          </div>
+
+          <!-- Лінійний індикатор відсотків -->
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-4 border border-slate-200/60">
+            <div id="progressTrackBar" class="h-full bg-gradient-to-r from-brand-600 to-accent-500 rounded-full transition-all duration-500" style="width: 0%;"></div>
+          </div>
+
+          <!-- Три інтерактивні чекбокси (Збереження у localStorage) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- Чекбокс 1 -->
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white cursor-pointer transition-all group">
+              <input type="checkbox" id="chkStep1" onchange="toggleStepCheckbox(1, this.checked)" class="w-5 h-5 rounded text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer transition-colors">
+              <div class="ml-3">
+                <span class="block text-xs font-bold text-slate-800 group-hover:text-brand-600 transition-colors">1. Відео опрацьовано</span>
+                <span class="block text-[11px] text-slate-500">Знання і Розуміння</span>
+              </div>
+            </label>
+
+            <!-- Чекбокс 2 -->
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white cursor-pointer transition-all group">
+              <input type="checkbox" id="chkStep2" onchange="toggleStepCheckbox(2, this.checked)" class="w-5 h-5 rounded text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer transition-colors">
+              <div class="ml-3">
+                <span class="block text-xs font-bold text-slate-800 group-hover:text-brand-600 transition-colors">2. Методику засвоєно</span>
+                <span class="block text-[11px] text-slate-500">Застосування і Аналіз</span>
+              </div>
+            </label>
+
+            <!-- Чекбокс 3 -->
+            <label class="flex items-center p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white cursor-pointer transition-all group">
+              <input type="checkbox" id="chkStep3" onchange="toggleStepCheckbox(3, this.checked)" class="w-5 h-5 rounded text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer transition-colors">
+              <div class="ml-3">
+                <span class="block text-xs font-bold text-slate-800 group-hover:text-brand-600 transition-colors">3. Кейс виконано</span>
+                <span class="block text-[11px] text-slate-500">Оцінювання і Створення</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Права частина: Кнопка активації Web Notifications API -->
+        <div class="lg:w-72 w-full pt-4 lg:pt-0 lg:border-l border-slate-200 lg:pl-6 flex flex-col justify-center">
+          <div class="text-xs text-slate-500 mb-2.5 flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left text-brand-600"></i>
+            <span>Смарт-підтримка навчального темпу:</span>
+          </div>
+          <button id="btnEnableNotifications" onclick="enableWebNotifications()" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-brand-700 to-indigo-800 hover:from-brand-800 hover:to-indigo-900 text-white font-semibold text-xs sm:text-sm shadow-md shadow-brand-900/20 transition-all flex items-center justify-center gap-2.5">
+            <i class="fa-solid fa-bell text-accent-300 animate-pulse"></i>
+            <span id="btnNotificationsText">Увімкнути розумні нагадування</span>
+          </button>
+          <span id="notificationStatusNote" class="text-[10px] text-slate-400 mt-2 text-center">
+            Повідомимо про перерви та підтримаємо мотивацію
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Головний контейнер курсу -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+    <!-- МОДУЛЬ 1 -->
+    <section id="module-1" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold tracking-wide uppercase">Модуль 1</span>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Таксономія Блума: Запам’ятовування та Розуміння</span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-4">
+        Когнітивний базис та візуальна аналітика
+      </h2>
+      <p class="text-slate-600 max-w-3xl mb-6 text-sm sm:text-base">
+        Ознайомтеся з основами мобільного трекінгу рухової активності спортсменів. Перегляньте навчальний інтерактивний відеоматеріал та обов'язково дайте відповіді на всі інтерактивні запитання, що з'являються всередині відеоплеєра Lumi під час перегляду, для закріплення базових фактів і понять.
+      </p>
+
+      <!-- Контейнер для Lumi iFrame (16:9 Aspect Ratio) -->
+      <div class="bg-white rounded-3xl p-3 sm:p-5 card-shadow border border-slate-200">
+        <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-inner">
+          <iframe 
+            src="https://app.lumi.education/api/v1/run/hmi5Rk/embed" 
+            class="absolute top-0 left-0 w-full h-full border-0" 
+            frameborder="0" 
+            allowfullscreen="allowfullscreen" 
+            allow="geolocation *; microphone *; camera *; midi *; encrypted-media *">
+          </iframe>
+        </div>
+        <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-slate-500 px-2 gap-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-blue-600"></i>
+            <span>Інтерактивне середовище H5P / Lumi Education. Реагуйте на контрольні мітки на шкалі часу.</span>
+          </div>
+          <span class="font-medium text-slate-600">Формат: Відеолекція з вбудованим самоконтролем</span>
+        </div>
+
+        <!-- Кнопка розблокування Модуля 2 -->
+        <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-xs text-slate-500 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-500"></i>
+            <span>Після завершення перегляду відео натисніть кнопку праворуч для відкриття теоретико-методичного розділу.</span>
+          </div>
+          <button id="btnCompleteMod1" onclick="unlockModule2(true)" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-700/20 transition-all flex items-center justify-center gap-2 shrink-0">
+            <span>Я опрацював відео та відповів на запитання — Перейти до Модуля 2</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЗАГЛУШКА-ЗАМОК ДЛЯ МОДУЛЯ 2 -->
+    <div id="module-2-locked" class="bg-slate-100/80 border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center max-w-4xl mx-auto my-6">
+      <div class="w-16 h-16 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-700 font-display mb-2">Модуль 2 заблоковано</h3>
+      <p class="text-sm text-slate-500 max-w-md mx-auto">
+        Цей модуль відповідає рівням <strong>«Застосування та Аналіз»</strong> таксономії Блума. Він стане доступним після опрацювання інтерактивного відео в Модулі 1 та натискання кнопки підтвердження вище.
+      </p>
+    </div>
+
+    <!-- МОДУЛЬ 2 (Вміст спочатку прихований) -->
+    <section id="module-2" class="scroll-mt-24 space-y-8 hidden">
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+          <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold tracking-wide uppercase">Модуль 2</span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Таксономія Блума: Застосування та Аналіз</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-3">
+          Методичний інструментарій моніторингу
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base max-w-3xl">
+          Повний курс дидактичних та теоретико-методичних матеріалів з реєстрації біомаркерів, юридичних вимог обігу персональних даних та запобігання когнітивним спотворенням під час прийняття тренерських рішень.
+        </p>
+      </div>
+
+      <!-- Ключове визначення (Callout Block) -->
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-950 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute right-0 bottom-0 translate-x-8 translate-y-8 text-white/5 text-9xl pointer-events-none">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div class="flex items-start space-x-4 relative z-10">
+          <div class="w-12 h-12 rounded-xl bg-accent-500 flex items-center justify-center shrink-0 text-white shadow-lg shadow-accent-500/30">
+            <i class="fa-solid fa-book-bookmark text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xs uppercase tracking-widest text-emerald-300 font-bold mb-2">Фундаментальне визначення поняття</h3>
+            <h4 class="text-xl sm:text-2xl font-bold font-display mb-3">Мобільні додатки для моніторингу рухової діяльності</h4>
+            <p class="text-slate-200 text-base sm:text-lg leading-relaxed font-light">
+              Під мобільними технологіями моніторингу рухової діяльності розуміють інтегрований комплекс апаратних портативних засобів і спеціалізованого програмного забезпечення, що забезпечує збір, бездротову передачу, обчислювальну обробку та мультимедійну візуалізацію кінематичних, динамічних і психофізіологічних маркерів тренувального навантаження.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Чотири рівні сенсорної реєстрації -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-200">
+        <div class="mb-6">
+          <div class="inline-flex items-center gap-2 text-xs font-bold text-accent-700 bg-accent-50 px-3 py-1 rounded-full uppercase mb-2">
+            <i class="fa-solid fa-satellite-dish"></i> Архітектура системи
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900">
+            Функціональний простір таких систем включає декілька взаємопов’язаних рівнів сенсорної реєстрації:
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Рівень 1 -->
+          <div class="border border-slate-200 rounded-2xl p-5 hover:border-brand-500 transition-colors bg-slate-50/50">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">1</span>
+              <h4 class="font-bold text-slate-900 text-base">Мікроелектромеханічні системи (MEMS)</h4>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Перший рівень базується на використанні вбудованих мікроелектромеханічних систем (MEMS), до яких належать тривісні акселерометри, гіроскопи та магнітометри, а також приймачі супутникового позиціонування (GNSS/GPS) сучасних мобільних пристроїв. Вони дозволяють із високою дискретністю фіксувати просторово-часові показники переміщення тіла у просторі, темпові характеристики, загальну подолану дистанцію та механічні прискорення без застосування інвазивних чи громіздких лабораторних установок.
+            </p>
+          </div>
+
+          <!-- Рівень 2 -->
+          <div class="border border-slate-200 rounded-2xl p-5 hover:border-brand-500 transition-colors bg-slate-50/50">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm">2</span>
+              <h4 class="font-bold text-slate-900 text-base">Мобільна оптика та комп'ютерний зір</h4>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Другий рівень реалізується завдяки прогресу в галузі мобільних оптичних систем та комп’ютерного зору. Застосування високошвидкісних камер сучасних смартфонів (з частотою зйомки 120–240 кадрів на секунду) у поєднанні з алгоритмами детекції опорних точок дозволяє проводити покадровий аналіз локомоцій, визначати тривалість фаз польоту й амортизації, а також оцінювати біомеханічну структуру складних рухових дій.
+            </p>
+          </div>
+
+          <!-- Рівень 3 -->
+          <div class="border border-slate-200 rounded-2xl p-5 hover:border-brand-500 transition-colors bg-slate-50/50">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 font-bold flex items-center justify-center text-sm">3</span>
+              <h4 class="font-bold text-slate-900 text-base">Оптична фотоплетизмографія (PPG)</h4>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Третій технологічний рівень спирається на оптичну фотоплетизмографію (PPG), що реалізується як через камеру та спалах смартфона, так і через портативні датчики пульсової хвилі. Дана технологія забезпечує точну детекцію інтервалів між серцевими скороченнями (R-R-інтервалів), відкриваючи можливість польової реєстрації вегетативного статусу та напруженості регуляторних систем серцево-судинного русла.
+            </p>
+          </div>
+
+          <!-- Рівень 4 -->
+          <div class="border border-slate-200 rounded-2xl p-5 hover:border-brand-500 transition-colors bg-slate-50/50">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 font-bold flex items-center justify-center text-sm">4</span>
+              <h4 class="font-bold text-slate-900 text-base">Зовнішні периферійні датчики</h4>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Четвертий рівень формують спеціалізовані зовнішні периферійні пристрої, такі як нагрудні монітори серцевого ритму, інерційні вимірювальні блоки (IMU) та датчики механічної потужності, що синхронізуються з мобільним терміналом через протоколи бездротового зв’язку малого радіуса дії (Bluetooth Low Energy, ANT+).
+            </p>
+          </div>
+        </div>
+
+        <!-- Доповнення: суб'єктивний самозвіт -->
+        <div class="mt-6 p-4 rounded-xl bg-slate-100 border border-slate-200 flex items-start gap-3">
+          <i class="fa-solid fa-clipboard-user text-brand-600 text-lg mt-0.5"></i>
+          <p class="text-slate-700 text-sm font-medium">
+            Поряд із прямими інструментальними замірами повноцінна екосистема включає цифрові модулі суб’єктивного самозвіту, які включають психоемоційний стан спортсмена в загальну діагностичну картину.
+          </p>
+        </div>
+      </div>
+
+      <!-- Правове поле та захист даних -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-200">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-shield-halved text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <div class="inline-flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full uppercase mb-1">
+              Правове регулювання & GDPR
+            </div>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
+              Правове поле регулювання обігу персональних даних
+            </h3>
+            <div class="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
+              <p>
+                Використання мобільних пристроїв і хмарних сервісів у процесі підготовки спортсменів виводить діяльність тренера в правове поле регулювання обігу персональних даних. Фізіологічні параметри, показники частоти серцевих скорочень, кардіоінтервалограми, відеозаписи рухів тіла та координати переміщення підпадають під визначення біометричних даних та інформації про стан здоров’я особи. Відповідно до Закону України «Про захист персональних даних» та Загального регламенту захисту даних Європейського Союзу (GDPR), такі відомості відносяться до особливої категорії чутливих персональних даних.
+              </p>
+              
+              <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-200 flex items-start gap-3">
+                <i class="fa-solid fa-file-signature text-amber-700 text-base mt-1"></i>
+                <p class="text-amber-950 font-medium">
+                  Збір, систематизація та аналіз будь-яких біометричних показників у мобільних додатках є законними виключно за умови отримання попередньої письмової інформованої згоди батьків або законних представників дитини.
+                </p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-rose-50/80 border border-rose-200 flex items-start gap-3">
+                <i class="fa-solid fa-ban text-rose-700 text-base mt-1"></i>
+                <p class="text-rose-950 font-medium">
+                  Програмне забезпечення повинно забезпечувати суворе дотримання цільового призначення: дані заборонено передавати третім сторонам, використовувати для рекламного профілювання або розміщувати на відкритих незахищених серверах.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Феномен Automation Bias -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-200">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <div class="inline-flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full uppercase mb-1">
+              Когнітивна пастка
+            </div>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
+              Психологічний феномен автоматизованого упередження (automation bias)
+            </h3>
+            
+            <div class="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
+              <p>
+                Поряд із юридичними обмеженнями, серйозну загрозу ефективності педагогічного процесу становить психологічний феномен автоматизованого упередження (automation bias).
+              </p>
+              <p>
+                Цей феномен проявляється у схильності тренера надмірно або беззастережно довіряти алгоритмічним рекомендаціям і розрахунковим індексам автоматизованих систем, нехтуючи суперечливою інформацією з реального оточення та власною професійною інтуїцією.
+              </p>
+              <p>
+                Поява мобільних платформ, які пропонують синтетичні бали «готовності» або маркування ризику травми на основі алгоритмів машинного навчання, підсилює цей ефект.
+              </p>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 italic">
+                <i class="fa-solid fa-quote-left text-slate-400 mr-2"></i>
+                Більшість подібних алгоритмів функціонує за принципом «чорної скриньки» і не пройшла незалежної зовнішньої наукової валідації. Дослідження демонструють, що на сьогодні навіть найскладніші математичні моделі прогнозування індивідуальних травм на основі даних навантаження мають вкрай низьку прогностичну цінність, що фактично не перевищує ймовірності випадкового вгадування.
+              </div>
+              <div class="p-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md">
+                <h4 class="font-bold text-white uppercase text-xs tracking-wider mb-1 flex items-center gap-2">
+                  <i class="fa-solid fa-user-check"></i> Принцип суб'єктності тренера
+                </h4>
+                <p class="font-medium text-white/95">
+                  У спортивній педагогіці будь-яка мобільна система повинна позиціонуватися виключно як дорадчий інструмент підтримки прийняття рішень. Кінцеве рішення щодо структури та змісту тренувального заняття завжди залишається за тренером як суб’єктом педагогічної відповідальності.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Таблиця моніторингу параметрів -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-200">
+        <div class="mb-6">
+          <div class="inline-flex items-center gap-2 text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full uppercase mb-2">
+            <i class="fa-solid fa-table-list"></i> Систематизація маркерів
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900">
+            Матриця параметрів польового моніторингу навантаження
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Комплексне співвідношення компонентів навантаження, біомеханічних показників та протоколів фіксації.
+          </p>
+        </div>
+
+        <!-- Адаптивна таблиця для Desktop / Планшетів -->
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-slate-200">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 text-slate-900 border-b border-slate-200">
+                <th class="p-4 font-bold text-xs uppercase tracking-wider">Параметр моніторингу</th>
+                <th class="p-4 font-bold text-xs uppercase tracking-wider">Компонент навантаження</th>
+                <th class="p-4 font-bold text-xs uppercase tracking-wider">Фізіологічний або біомеханічний показник</th>
+                <th class="p-4 font-bold text-xs uppercase tracking-wider">Мобільне апаратне забезпечення</th>
+                <th class="p-4 font-bold text-xs uppercase tracking-wider">Рекомендований протокол фіксації</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-slate-700">
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 font-semibold text-slate-900">Спектр бігових швидкостей та обсяг</td>
+                <td class="p-4"><span class="px-2.5 py-1 rounded-md bg-blue-100 text-blue-800 text-xs font-semibold">Зовнішнє механічне навантаження</span></td>
+                <td class="p-4">Механічна робота локомоторного апарату, енергетичні витрати</td>
+                <td class="p-4">Носимі GNSS/GPS-модулі або смартфон у поясному тримачі</td>
+                <td class="p-4 text-xs font-medium text-slate-600">Фіксація в режимі реального часу протягом усієї сесії</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 font-semibold text-slate-900">Тест вертикального вистрибування</td>
+                <td class="p-4"><span class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 text-xs font-semibold">Зовнішня нейром’язова продуктивність</span></td>
+                <td class="p-4">Функціональний стан мотонейронного пулу, вибухова сила</td>
+                <td class="p-4">Смартфон із камерою високої частоти кадрів (≥120)</td>
+                <td class="p-4 text-xs font-medium text-slate-600">1–2 рази на тиждень перед тренувальною роботою</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 font-semibold text-slate-900">Ранковий індекс LnRMSSD</td>
+                <td class="p-4"><span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-semibold">Внутрішнє вегетативне навантаження</span></td>
+                <td class="p-4">Активність парасимпатичного відділу ВНС, системний стрес</td>
+                <td class="p-4">Вбудована камера смартфона (PPG) або нагрудний Bluetooth-датчик</td>
+                <td class="p-4 text-xs font-medium text-slate-600">Щоденно вранці в положенні лежачи після пробудження (тривалість 60 с)</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 font-semibold text-slate-900">Сесійний sRPE</td>
+                <td class="p-4"><span class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 text-xs font-semibold">Внутрішнє інтегральне навантаження</span></td>
+                <td class="p-4">Психофізіологічна ціна виконаного тренувального заняття</td>
+                <td class="p-4">Мобільний опитувальник (Google Forms або спеціалізований додаток)</td>
+                <td class="p-4 text-xs font-medium text-slate-600">Щоденно, через 15–30 хвилин після закінчення тренування</td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 font-semibold text-slate-900">Шкала загального самопочуття</td>
+                <td class="p-4"><span class="px-2.5 py-1 rounded-md bg-rose-100 text-rose-800 text-xs font-semibold">Внутрішній психоемоційний статус</span></td>
+                <td class="p-4">М’язовий біль, рівень загального стресу, настрій, тривалість сну</td>
+                <td class="p-4">Цифрова опитувальна шкала на мобільному пристрої</td>
+                <td class="p-4 text-xs font-medium text-slate-600">Щоранку або за 30 хвилин до початку тренувальної сесії</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Мобільна версія у вигляді структурованих карток -->
+        <div class="lg:hidden space-y-4">
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 space-y-2.5">
+            <div class="flex justify-between items-start gap-2">
+              <h4 class="font-bold text-slate-900 text-base">Спектр бігових швидкостей та обсяг</h4>
+              <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-semibold">Зовнішнє навантаження</span>
+            </div>
+            <div class="text-xs space-y-1 text-slate-600">
+              <p><strong class="text-slate-800">Показник:</strong> Механічна робота локомоторного апарату, енергетичні витрати</p>
+              <p><strong class="text-slate-800">Обладнання:</strong> Носимі GNSS/GPS-модулі або смартфон у поясному тримачі</p>
+              <p><strong class="text-slate-800">Протокол:</strong> Фіксація в режимі реального часу протягом усієї сесії</p>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 space-y-2.5">
+            <div class="flex justify-between items-start gap-2">
+              <h4 class="font-bold text-slate-900 text-base">Тест вертикального вистрибування</h4>
+              <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 text-xs font-semibold">Нейром’язова прод.</span>
+            </div>
+            <div class="text-xs space-y-1 text-slate-600">
+              <p><strong class="text-slate-800">Показник:</strong> Функціональний стан мотонейронного пулу, вибухова сила</p>
+              <p><strong class="text-slate-800">Обладнання:</strong> Смартфон із камерою високої частоти кадрів (≥120)</p>
+              <p><strong class="text-slate-800">Протокол:</strong> 1–2 рази на тиждень перед тренувальною роботою</p>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 space-y-2.5">
+            <div class="flex justify-between items-start gap-2">
+              <h4 class="font-bold text-slate-900 text-base">Ранковий індекс LnRMSSD</h4>
+              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-semibold">Вегетативний статус</span>
+            </div>
+            <div class="text-xs space-y-1 text-slate-600">
+              <p><strong class="text-slate-800">Показник:</strong> Активність парасимпатичного відділу ВНС, системний стрес</p>
+              <p><strong class="text-slate-800">Обладнання:</strong> Вбудована камера смартфона (PPG) або нагрудний Bluetooth-датчик</p>
+              <p><strong class="text-slate-800">Протокол:</strong> Щоденно вранці в положенні лежачи після пробудження (тривалість 60 с)</p>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 space-y-2.5">
+            <div class="flex justify-between items-start gap-2">
+              <h4 class="font-bold text-slate-900 text-base">Сесійний sRPE</h4>
+              <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-xs font-semibold">Інтегральне нав.</span>
+            </div>
+            <div class="text-xs space-y-1 text-slate-600">
+              <p><strong class="text-slate-800">Показник:</strong> Психофізіологічна ціна виконаного тренувального заняття</p>
+              <p><strong class="text-slate-800">Обладнання:</strong> Мобільний опитувальник (Google Forms або спеціалізований додаток)</p>
+              <p><strong class="text-slate-800">Протокол:</strong> Щоденно, через 15–30 хвилин після закінчення тренування</p>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 space-y-2.5">
+            <div class="flex justify-between items-start gap-2">
+              <h4 class="font-bold text-slate-900 text-base">Шкала загального самопочуття</h4>
+              <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-xs font-semibold">Психоемоційний стан</span>
+            </div>
+            <div class="text-xs space-y-1 text-slate-600">
+              <p><strong class="text-slate-800">Показник:</strong> М’язовий біль, рівень загального стресу, настрій, тривалість сну</p>
+              <p><strong class="text-slate-800">Обладнання:</strong> Цифрова опитувальна шкала на мобільному пристрої</p>
+              <p><strong class="text-slate-800">Протокол:</strong> Щоранку або за 30 хвилин до початку тренувальної сесії</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Кнопка переходу до Модуля 3 -->
+        <div class="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-xs text-slate-500 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600"></i>
+            <span>Теоретичний блок завершено. Перейдіть до розв'язання ситуаційного завдання.</span>
+          </div>
+          <button id="btnCompleteMod2" onclick="unlockModule3(true)" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-semibold text-sm shadow-md shadow-accent-700/20 transition-all flex items-center justify-center gap-2 shrink-0">
+            <span>Я засвоїв методичні матеріали — Відкрити практичний кейс (Модуль 3)</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЗАГЛУШКА-ЗАМОК ДЛЯ МОДУЛЯ 3 -->
+    <div id="module-3-locked" class="bg-slate-100/80 border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center max-w-4xl mx-auto my-6">
+      <div class="w-16 h-16 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-700 font-display mb-2">Модуль 3 заблоковано</h3>
+      <p class="text-sm text-slate-500 max-w-md mx-auto">
+        Цей модуль відповідає найвищим рівням <strong>«Оцінювання та Створення»</strong> таксономії Блума. Він розблокується після опрацювання матеріалів Модуля 2 та натискання кнопки підтвердження в кінці розділу.
+      </p>
+    </div>
+
+    <!-- МОДУЛЬ 3 (Вміст спочатку прихований) -->
+    <section id="module-3" class="scroll-mt-24 space-y-8 hidden">
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+          <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold tracking-wide uppercase">Модуль 3</span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Таксономія Блума: Оцінювання та Створення</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-3">
+          Практичний кейс, рефлексія та сертифікація
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base max-w-3xl">
+          Проаналізуйте наведений практичний кейс тренерського вибору. Зіставте запропоновані стратегії впровадження мобільних додатків і заповніть форму оцінювання для отримання електронного сертифіката.
+        </p>
+      </div>
+
+      <!-- Контейнер практичного кейсу -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border-2 border-slate-200/80">
+        <!-- Заголовок кейсу -->
+        <div class="border-b border-slate-200 pb-6 mb-6">
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-700 mb-2">
+            <i class="fa-solid fa-briefcase"></i> Професійна ситуаційна задача
+          </div>
+          <h3 class="text-lg sm:text-2xl font-bold text-slate-900 leading-snug">
+            В процесі планування та реалізації підготовки групи спортсменів періоду базової підготовки, тренер вирішує використати мобільні технології для збору даних про тренувальний процес. Який шлях буде найбільш раціональних щодо вибору та впровадження мобільних технологій в тренувальний процес спортсменів? Обґрунтуйте свій вибір, за можливості наведіть реальний приклад з власного досвіду (тренерської або спортивної практики)
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-3 flex items-center gap-2">
+            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+            <span>Уважно прочитайте варіанти та зробіть обґрунтований вибір, натиснувши кнопку під відповідним шляхом.</span>
+          </p>
+        </div>
+
+        <!-- Альтернативні шляхи вирішення кейсу (початково мають однаковий нейтральний вигляд) -->
+        <div class="space-y-6">
+          <!-- Шлях 1 -->
+          <div id="card-path-1" class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <span id="badge-path-1" class="w-8 h-8 rounded-full bg-slate-200 text-slate-800 font-bold flex items-center justify-center text-sm shrink-0">1</span>
+              <h4 class="font-bold text-slate-900 text-base sm:text-lg">Шлях 1</h4>
+            </div>
+            <p class="text-slate-700 text-sm sm:text-base mb-4 leading-relaxed font-normal">
+              Проаналізувати сучасні пропозиції на ринку в контексті використання мобільних технологій в обраному виді спорту. Сформувати перелік технологій та запит на їх закупівлю до керівників спортивної організації, де проводиться спортивна підготовка, та батьків юних спортсменів.
+            </p>
+            
+            <!-- Кнопка вибору -->
+            <button id="btn-select-1" onclick="choosePath(1)" class="btn-choose px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-brand-600 hover:text-white text-slate-700 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Обрати цей шлях як основне рішення</span>
+            </button>
+
+            <!-- Блок Результат 1 (прихований) -->
+            <div id="result-path-1" class="hidden mt-4 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs sm:text-sm transition-all">
+              <span class="font-bold uppercase tracking-wide block mb-1 text-rose-800">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Результат:
+              </span>
+              необґрунтований вибір мобільних технологій може призвести до: 1) спротиву залучених осіб щодо їх закупівлі (значна вартість, нерозуміння технології тощо); 2) додаткових часових витрат на опанування мобільних технології; 3) ускладнення інтерпретації даних в контексті підготовки юних спортсменів (більшість комерційних пропозицій орієнтовані на професійний спорт)
+            </div>
+          </div>
+
+          <!-- Шлях 2 -->
+          <div id="card-path-2" class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <span id="badge-path-2" class="w-8 h-8 rounded-full bg-slate-200 text-slate-800 font-bold flex items-center justify-center text-sm shrink-0">2</span>
+              <h4 class="font-bold text-slate-900 text-base sm:text-lg">Шлях 2</h4>
+            </div>
+            <p class="text-slate-700 text-sm sm:text-base mb-4 leading-relaxed font-normal">
+              Проаналізувати сучасні пропозиції на ринку в контексті використання мобільних технологій в обраному виді спорту. Визначити доцільність застосування окремих мобільних інструментів для вирішення питання збору даних про тренувальний процес. Кумунікувати з керівниками спортивної організації, де проводиться спортивна підготовка, та батьками юних спортсменів тренувальної групи щодо можливостей забезпечення обраними мобільними інструментами.
+            </p>
+
+            <!-- Кнопка вибору -->
+            <button id="btn-select-2" onclick="choosePath(2)" class="btn-choose px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-brand-600 hover:text-white text-slate-700 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Обрати цей шлях як основне рішення</span>
+            </button>
+
+            <!-- Блок Результат 2 (прихований) -->
+            <div id="result-path-2" class="hidden mt-4 p-4 rounded-xl bg-emerald-100/70 border border-emerald-300 text-emerald-950 text-xs sm:text-sm transition-all">
+              <span class="font-bold uppercase tracking-wide block mb-1 text-emerald-900">
+                <i class="fa-solid fa-circle-check mr-1"></i> Результат:
+              </span>
+              поміркований підхід до вирішення питання може призвести до: 1) обґрунтований підбір мобільних технологій (пропозиції + наука + практика); 2) створення умов раціонального підбору доступних технологій безпосередньо для групи спортсменів базової підготовки; 3) зворотній зв’язок зі стейкхолдерами для оптимізації процесу впровадження мобільних технологій.
+            </div>
+          </div>
+
+          <!-- Шлях 3 -->
+          <div id="card-path-3" class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <span id="badge-path-3" class="w-8 h-8 rounded-full bg-slate-200 text-slate-800 font-bold flex items-center justify-center text-sm shrink-0">3</span>
+              <h4 class="font-bold text-slate-900 text-base sm:text-lg">Шлях 3</h4>
+            </div>
+            <p class="text-slate-700 text-sm sm:text-base mb-4 leading-relaxed font-normal">
+              Проаналізувати сучасні пропозиції на ринку в контексті використання мобільних технологій в обраному виді спорту. Сформувати власне уявлення що збору даних про тренувальний процес з використанням різних мобільних технологій, виявити недоліки сучасних підходів. Спроектувати підхід до обґрунтованого моніторингу тренувального процесу з використанням мобільних технологій. Сформувати запит розробку та пілотну апробацію мобільного моніторингу тренувального процесу до керівників спортивної організації, де проводиться спортивна підготовка, та батьків юних спортсменів.
+            </p>
+
+            <!-- Кнопка вибору -->
+            <button id="btn-select-3" onclick="choosePath(3)" class="btn-choose px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-brand-600 hover:text-white text-slate-700 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Обрати цей шлях як основне рішення</span>
+            </button>
+
+            <!-- Блок Результат 3 (прихований) -->
+            <div id="result-path-3" class="hidden mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs sm:text-sm transition-all">
+              <span class="font-bold uppercase tracking-wide block mb-1 text-amber-800">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Результат:
+              </span>
+              ґрунтовний підхід до вирішення питання може призвести до: 1) створення цілісної моделі інтеграції мобільних технологій в тренувальних процес; 2) значних часових витрат на розширення компетентностей тренера, зокрема, в сфері ІКТ; 3) переключення уваги тренера на розробку підходу до використання мобільних технологій, а не їх безпосереднє впровадження в тренувальний процес для вирішення проблемного питання.
+            </div>
+          </div>
+        </div>
+
+        <!-- Кнопка для порівняльного аналізу всіх результатів -->
+        <div id="compareContainer" class="hidden mt-8 pt-6 border-t border-slate-200 text-center">
+          <button id="btnShowAllPaths" onclick="revealAllPathResults()" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold shadow-md transition-all inline-flex items-center gap-2">
+            <i class="fa-solid fa-code-compare text-emerald-400"></i>
+            <span>Переглянути результати інших альтернативних шляхів для порівняльного аналізу</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Інформаційна плашка-заглушка перед вибором кейсу -->
+      <div id="form-locked-placeholder" class="bg-amber-50 border-2 border-dashed border-amber-300 rounded-3xl p-8 text-center max-w-4xl mx-auto">
+        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-3 text-xl">
+          <i class="fa-solid fa-clipboard-question"></i>
+        </div>
+        <h4 class="font-bold text-slate-800 text-base sm:text-lg mb-1">Рефлексія заблокована</h4>
+        <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
+          Форма рефлексії та отримання сертифіката відкриється одразу після того, як ви проаналізуєте ситуацію та оберете один із шляхів вирішення кейсу вище.
+        </p>
+      </div>
+
+      <!-- Інтерактивна форма для сертифікації Google Forms -->
+      <div id="form-container" class="hidden bg-white rounded-3xl p-4 sm:p-8 card-shadow border border-slate-200 transition-all duration-500">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-award text-accent-600"></i> Форма рефлексії та верифікації сертифіката
+            </h3>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">
+              Надайте відповіді на запитання практичного кейсу та підтвердьте засвоєння мікрокурсу для автоматичної генерації сертифіката.
+            </p>
+          </div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Активна форма
+          </span>
+        </div>
+
+        <!-- Адаптивний контейнер Google Forms (висота мінімум 900px для усунення подвійного скролінгу) -->
+        <div class="w-full bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 min-h-[920px]">
+          <iframe 
+            src="https://docs.google.com/forms/d/e/1FAIpQLSdDLRV_7NCvUui9hfTdAe9UtZDKBpI6JU2xEfRnnXX4VUbm1w/viewform?embedded=true" 
+            class="w-full h-[950px] sm:h-[920px] border-0" 
+            frameborder="0" 
+            marginheight="0" 
+            marginwidth="0">
+            Завантаження…
+          </iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Підвал сторінки -->
+  <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-accent-500 flex items-center justify-center text-white font-bold">
+            <i class="fa-solid fa-dumbbell"></i>
+          </div>
+          <div>
+            <span class="text-white font-display font-bold block text-sm sm:text-base">Кафедра фізичного виховання і спорту</span>
+            <span class="text-xs text-slate-400">Навчально-методичний комплекс цифрової освіти</span>
+          </div>
+        </div>
+
+        <!-- Кнопка скидання прогресу для тестування та авторські права -->
+        <div class="flex flex-col items-center md:items-end gap-2 text-center md:text-right text-xs text-slate-400">
+          <p>© 2026. Розроблено для здобувачів вищої освіти та фахівців галузі фізичної культури і спорту.</p>
+          <p>Всі методичні матеріали верифіковано згідно з таксономією Б. Блума та нормативами GDPR.</p>
+          <button onclick="resetCourseProgress()" class="mt-2 text-xs text-slate-400 hover:text-amber-400 underline transition-colors flex items-center gap-1.5 focus:outline-none">
+            <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+            <span>Скинути прогрес курсу (тестування)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Клієнтська логіка системи мотивації та прогресу на чистому JavaScript -->
+  <script>
+    // Стан курсу (зберігається в localStorage)
+    const STORAGE_KEY = 'sport_monitoring_course_progress_v2';
+    let courseState = {
+      module2Unlocked: false,
+      module3Unlocked: false,
+      selectedPath: null,
+      allResultsRevealed: false,
+      step1Completed: false,
+      step2Completed: false,
+      step3Completed: false,
+      notificationsEnabled: false
+    };
+
+    // Таймери та змінні відстеження неактивності
+    const INACTIVITY_LIMIT_MS = 3 * 60 * 1000; // 3 хвилини
+    let inactivityTimer = null;
+    let lastUserActivityTimestamp = Date.now();
+    let audioContext = null;
+
+    // Генерація звукового сигналу через Web Audio API (резервний аудіо-сигнал без зовнішніх файлів)
+    function playNotificationChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!audioContext) audioContext = new AudioCtx();
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = 'sine';
+        // Мелодійний двотональний сигнал
+        osc.frequency.setValueAtTime(587.33, audioContext.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880.00, audioContext.currentTime + 0.15); // A5
+        gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + 0.35);
+      } catch (e) {
+        console.warn('Аудіо-сигнал заблоковано політикою браузера', e);
+      }
+    }
+
+    // Уніфіковане відправлення повідомлень (Push Web Notification + резервний візуальний Toast)
+    function notifyLearner(title, message, iconType = 'info') {
+      // 1. Відтворення звуку
+      playNotificationChime();
+
+      // 2. Спроба відправити системне Web Notification
+      let pushSent = false;
+      if (courseState.notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
+        try {
+          const sysNotification = new Notification(title, {
+            body: message,
+            icon: 'https://cdn-icons-png.flaticon.com/512/2964/2964514.png',
+            tag: 'sport-learning-trigger'
+          });
+          sysNotification.onclick = function() {
+            window.focus();
+            this.close();
+          };
+          pushSent = true;
+        } catch (e) {
+          console.warn('Помилка виклику системного Notification API:', e);
+        }
+      }
+
+      // 3. Дублювання у спливаючий екранний Toast
+      showToast(message, title, iconType);
+    }
+
+    // Відображення стилізованого Toast
+    function showToast(message, title = 'Освітнє сповіщення', iconType = 'info') {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastIcon = document.getElementById('toastIcon');
+      const toastIconContainer = document.getElementById('toastIconContainer');
+
+      if (!toast || !toastMsg) return;
+
+      toastMsg.textContent = message;
+      toastTitle.textContent = title;
+
+      if (iconType === 'success') {
+        toastIcon.className = 'fa-solid fa-circle-check';
+        toastIconContainer.className = 'w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-lg border border-emerald-500/30';
+      } else if (iconType === 'alert') {
+        toastIcon.className = 'fa-solid fa-bell';
+        toastIconContainer.className = 'w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 text-lg border border-amber-500/30';
+      } else {
+        toastIcon.className = 'fa-solid fa-graduation-cap';
+        toastIconContainer.className = 'w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-lg border border-blue-500/30';
+      }
+
+      toast.classList.remove('translate-y-32', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-32', 'opacity-0');
+      }, 5000);
+    }
+
+    // Активація розумних Web Notifications API
+    function enableWebNotifications() {
+      // Ініціалізація аудіоконтексту при взаємодії користувача
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx && !audioContext) audioContext = new AudioCtx();
+        if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+      } catch (err) {}
+
+      if (!('Notification' in window)) {
+        showToast('Ваш браузер не підтримує системні Web Notifications. Використовуються вбудовані інтерактивні сповіщення.', 'Підтримка браузера', 'alert');
+        courseState.notificationsEnabled = true;
+        saveProgress();
+        updateNotificationUI();
+        return;
+      }
+
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          courseState.notificationsEnabled = true;
+          saveProgress();
+          updateNotificationUI();
+          notifyLearner(
+            'Сповіщення активовано',
+            'Сповіщення активовано. Ми допоможемо вам тримати темп під час вивчення мобільних додатків моніторингу рухової діяльності.',
+            'success'
+          );
+        } else {
+          showToast('Дозвіл на системні сповіщення відхилено. Активуємо резервні інтерактивні сповіщення на сторінці.', 'Налаштування повідомлень', 'alert');
+          courseState.notificationsEnabled = true;
+          saveProgress();
+          updateNotificationUI();
+        }
+      });
+    }
+
+    function updateNotificationUI() {
+      const btnText = document.getElementById('btnNotificationsText');
+      const note = document.getElementById('notificationStatusNote');
+      const btn = document.getElementById('btnEnableNotifications');
+      if (courseState.notificationsEnabled) {
+        if (btnText) btnText.textContent = 'Розумні нагадування увімкнено';
+        if (note) note.textContent = 'Система відстежує активність та підтримує мотивацію';
+        if (btn) {
+          btn.className = 'w-full px-4 py-3 rounded-xl bg-emerald-700 text-white font-semibold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2.5 cursor-default';
+        }
+      }
+    }
+
+    // Завантаження стану з localStorage
+    function loadProgress() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          courseState = Object.assign(courseState, JSON.parse(saved));
+        } catch (e) {
+          console.error('Помилка читання прогресу', e);
+        }
+      }
+      applyStateToUI();
+      updateNotificationUI();
+      updateTrackerUI();
+      setupInactivityTracking();
+    }
+
+    // Збереження стану в localStorage
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(courseState));
+      updateTrackerUI();
+    }
+
+    // Скидання прогресу
+    function resetCourseProgress() {
+      if (confirm('Скинути весь збережений прогрес, історію сповіщень та розпочати курс спочатку?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    }
+
+    // Оновлення віджета трекера прогресу
+    function updateTrackerUI() {
+      const chk1 = document.getElementById('chkStep1');
+      const chk2 = document.getElementById('chkStep2');
+      const chk3 = document.getElementById('chkStep3');
+      const trackBar = document.getElementById('progressTrackBar');
+      const percentBadge = document.getElementById('progressPercentBadge');
+
+      if (chk1) chk1.checked = !!courseState.step1Completed;
+      if (chk2) chk2.checked = !!courseState.step2Completed;
+      if (chk3) chk3.checked = !!courseState.step3Completed;
+
+      let completedCount = 0;
+      if (courseState.step1Completed) completedCount++;
+      if (courseState.step2Completed) completedCount++;
+      if (courseState.step3Completed) completedCount++;
+
+      const percent = Math.round((completedCount / 3) * 100);
+      if (trackBar) trackBar.style.width = percent + '%';
+      if (percentBadge) percentBadge.textContent = percent + '% завершено';
+    }
+
+    // Обробка зміни чекбоксів користувачем
+    function toggleStepCheckbox(stepNum, isChecked) {
+      if (stepNum === 1) {
+        courseState.step1Completed = isChecked;
+        if (isChecked) {
+          unlockModule2(false);
+          notifyLearner(
+            'Рівень 1-2 завершено',
+            'Чудовий старт. Рівні знання та розуміння пройдено. Час перейти до аналізу методичних матеріалів.',
+            'success'
+          );
+        }
+      } else if (stepNum === 2) {
+        courseState.step2Completed = isChecked;
+        if (isChecked) {
+          unlockModule3(false);
+          notifyLearner(
+            'Рівень 3-4 завершено',
+            'Ви на фінішній прямій. Залишилося розв’язати практичний кейс на рівні оцінювання та створення для генерації вашого сертифіката.',
+            'success'
+          );
+        }
+      } else if (stepNum === 3) {
+        courseState.step3Completed = isChecked;
+        if (isChecked) {
+          notifyLearner(
+            'Курс завершено!',
+            'Вітаємо! Всі рівні таксономії Блума пройдено. Заповніть форму зворотного зв’язку для отримання сертифіката.',
+            'success'
+          );
+        }
+      }
+      saveProgress();
+    }
+
+    // Відображення стану в UI (розблокування модулів)
+    function applyStateToUI() {
+      // Модуль 2
+      const mod2 = document.getElementById('module-2');
+      const mod2Locked = document.getElementById('module-2-locked');
+      const navIcon2 = document.getElementById('nav-icon-2');
+      const mobNavIcon2 = document.getElementById('mob-nav-icon-2');
+      const btnCompleteMod1 = document.getElementById('btnCompleteMod1');
+
+      if (courseState.module2Unlocked || courseState.step1Completed) {
+        mod2.classList.remove('hidden');
+        mod2Locked.classList.add('hidden');
+        navIcon2.className = 'fa-solid fa-check text-xs text-emerald-600';
+        mobNavIcon2.className = 'fa-solid fa-check text-xs text-emerald-600';
+        if (btnCompleteMod1) {
+          btnCompleteMod1.innerHTML = '<span><i class="fa-solid fa-check mr-1.5"></i> Етап 1 завершено (Модуль 2 відкрито)</span>';
+          btnCompleteMod1.className = 'w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-200 text-slate-700 font-semibold text-sm transition-all flex items-center justify-center gap-2 shrink-0 cursor-default';
+        }
+      } else {
+        mod2.classList.add('hidden');
+        mod2Locked.classList.remove('hidden');
+        navIcon2.className = 'fa-solid fa-lock text-xs text-slate-400';
+        mobNavIcon2.className = 'fa-solid fa-lock text-xs text-slate-400';
+      }
+
+      // Модуль 3
+      const mod3 = document.getElementById('module-3');
+      const mod3Locked = document.getElementById('module-3-locked');
+      const navIcon3 = document.getElementById('nav-icon-3');
+      const mobNavIcon3 = document.getElementById('mob-nav-icon-3');
+      const btnCompleteMod2 = document.getElementById('btnCompleteMod2');
+
+      if (courseState.module3Unlocked || courseState.step2Completed) {
+        mod3.classList.remove('hidden');
+        mod3Locked.classList.add('hidden');
+        navIcon3.className = 'fa-solid fa-check text-xs text-emerald-600';
+        mobNavIcon3.className = 'fa-solid fa-check text-xs text-emerald-600';
+        if (btnCompleteMod2) {
+          btnCompleteMod2.innerHTML = '<span><i class="fa-solid fa-check mr-1.5"></i> Етап 2 завершено (Модуль 3 відкрито)</span>';
+          btnCompleteMod2.className = 'w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-200 text-slate-700 font-semibold text-sm transition-all flex items-center justify-center gap-2 shrink-0 cursor-default';
+        }
+      } else {
+        mod3.classList.add('hidden');
+        mod3Locked.classList.remove('hidden');
+        navIcon3.className = 'fa-solid fa-lock text-xs text-slate-400';
+        mobNavIcon3.className = 'fa-solid fa-lock text-xs text-slate-400';
+      }
+
+      // Відновлення вибору в кейсі
+      if (courseState.selectedPath) {
+        renderPathSelection(courseState.selectedPath);
+      }
+      if (courseState.allResultsRevealed) {
+        renderAllPathsRevealed();
+      }
+    }
+
+    // Розблокування Модуля 2
+    function unlockModule2(autoScroll = false) {
+      const isFirstUnlock = !courseState.module2Unlocked && !courseState.step1Completed;
+      courseState.module2Unlocked = true;
+      courseState.step1Completed = true;
+      saveProgress();
+      applyStateToUI();
+
+      if (isFirstUnlock) {
+        notifyLearner(
+          'Рівень 1-2 завершено',
+          'Чудовий старт. Рівні знання та розуміння пройдено. Час перейти до аналізу методичних матеріалів.',
+          'success'
+        );
+      }
+
+      if (autoScroll) {
+        const target = document.getElementById('module-2');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+
+    // Розблокування Модуля 3
+    function unlockModule3(autoScroll = false) {
+      const isFirstUnlock = !courseState.module3Unlocked && !courseState.step2Completed;
+      courseState.module3Unlocked = true;
+      courseState.step2Completed = true;
+      saveProgress();
+      applyStateToUI();
+
+      if (isFirstUnlock) {
+        notifyLearner(
+          'Рівень 3-4 завершено',
+          'Ви на фінішній прямій. Залишилося розв’язати практичний кейс на рівні оцінювання та створення для генерації вашого сертифіката.',
+          'success'
+        );
+      }
+
+      if (autoScroll) {
+        const target = document.getElementById('module-3');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+
+    // Обробка кліку по навігації
+    function handleNavClick(event, moduleNum) {
+      if (moduleNum === 2 && !courseState.module2Unlocked && !courseState.step1Completed) {
+        event.preventDefault();
+        notifyLearner('Увага!', 'Модуль 2 заблоковано! Завершіть перегляд відео в Модулі 1 та натисніть кнопку підтвердження.', 'alert');
+      } else if (moduleNum === 3 && !courseState.module3Unlocked && !courseState.step2Completed) {
+        event.preventDefault();
+        notifyLearner('Увага!', 'Модуль 3 заблоковано! Опрацюйте матеріали Модуля 2 та відкрийте практичний кейс.', 'alert');
+      }
+    }
+
+    // Вибір студентом шляху у практичному кейсі
+    function choosePath(pathNumber) {
+      courseState.selectedPath = pathNumber;
+      courseState.step3Completed = true;
+      saveProgress();
+      renderPathSelection(pathNumber);
+
+      const selectedResult = document.getElementById('result-path-' + pathNumber);
+      if (selectedResult) {
+        selectedResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function renderPathSelection(pathNumber) {
+      const resBlock = document.getElementById('result-path-' + pathNumber);
+      if (resBlock) {
+        resBlock.classList.remove('hidden');
+      }
+
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById('btn-select-' + i);
+        if (btn) {
+          if (i === pathNumber) {
+            btn.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i> <span>Ви обрали цей варіант</span>';
+            btn.className = 'btn-choose px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-300 text-brand-800 text-xs sm:text-sm font-bold transition-all flex items-center gap-2';
+          } else {
+            btn.innerHTML = '<i class="fa-regular fa-circle"></i> <span>Обрати цей шлях як основне рішення</span>';
+            btn.className = 'btn-choose px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs sm:text-sm font-medium transition-all flex items-center gap-2';
+          }
+        }
+      }
+
+      const compareContainer = document.getElementById('compareContainer');
+      if (compareContainer) {
+        compareContainer.classList.remove('hidden');
+      }
+
+      const formLocked = document.getElementById('form-locked-placeholder');
+      const formContainer = document.getElementById('form-container');
+      if (formLocked) formLocked.classList.add('hidden');
+      if (formContainer) formContainer.classList.remove('hidden');
+    }
+
+    // Відкриття результатів усіх шляхів для порівняльного аналізу
+    function revealAllPathResults() {
+      courseState.allResultsRevealed = true;
+      saveProgress();
+      renderAllPathsRevealed();
+    }
+
+    function renderAllPathsRevealed() {
+      for (let i = 1; i <= 3; i++) {
+        const res = document.getElementById('result-path-' + i);
+        if (res) res.classList.remove('hidden');
+      }
+
+      const card2 = document.getElementById('card-path-2');
+      const badge2 = document.getElementById('badge-path-2');
+      if (card2) {
+        card2.className = 'p-5 sm:p-6 rounded-2xl bg-emerald-50/60 border-2 border-emerald-300 transition-all';
+      }
+      if (badge2) {
+        badge2.className = 'w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shrink-0';
+      }
+
+      const btnShowAll = document.getElementById('btnShowAllPaths');
+      if (btnShowAll) {
+        btnShowAll.innerHTML = '<i class="fa-solid fa-check-double text-emerald-400"></i> <span>Результати всіх шляхів відкрито для порівняння</span>';
+        btnShowAll.disabled = true;
+        btnShowAll.classList.replace('bg-slate-800', 'bg-slate-700');
+      }
+    }
+
+    // ТРИГЕР НЕАКТИВНОСТІ (PAGE VISIBILITY API ТА ВІДСТЕЖЕННЯ РУХУ)
+    function setupInactivityTracking() {
+      function resetInactivity() {
+        lastUserActivityTimestamp = Date.now();
+      }
+
+      ['mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
+        window.addEventListener(evt, resetInactivity, { passive: true });
+      });
+
+      // Перевірка кожні 15 секунд
+      setInterval(() => {
+        const isAllCompleted = courseState.step1Completed && courseState.step2Completed && courseState.step3Completed;
+        if (isAllCompleted) return;
+
+        const inactiveDuration = Date.now() - lastUserActivityTimestamp;
+        if (inactiveDuration >= INACTIVITY_LIMIT_MS) {
+          // Скидаємо позначку часу, щоб нагадування спрацьовувало знову через інтервал
+          lastUserActivityTimestamp = Date.now();
+          notifyLearner(
+            'Тренування інтелекту',
+            'Поверніться до тренування інтелекту. Ви зупинилися на шляху до опанування моніторингу рухової діяльності. Завершіть поточний модуль, щоб отримати сертифікат.',
+            'alert'
+          );
+        }
+      }, 15000);
+
+      // Реагування на зміну видимості вкладки
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          const inactiveDuration = Date.now() - lastUserActivityTimestamp;
+          const isAllCompleted = courseState.step1Completed && courseState.step2Completed && courseState.step3Completed;
+          if (inactiveDuration >= INACTIVITY_LIMIT_MS && !isAllCompleted) {
+            lastUserActivityTimestamp = Date.now();
+            notifyLearner(
+              'Раді вас знову бачити!',
+              'Поверніться до тренування інтелекту. Ви зупинилися на шляху до опанування моніторингу рухової діяльності. Завершіть поточний модуль, щоб отримати сертифікат.',
+              'alert'
+            );
+          }
+        }
+      });
+    }
+
+    // Смуга прогресу прокручування
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      const progressBar = document.getElementById('scrollProgress');
+      if (progressBar) {
+        progressBar.style.width = scrolled + '%';
+      }
+    });
+
+    // Мобільне меню
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+        });
+      });
+    }
+
+    // Ініціалізація курсу при завантаженні сторінки
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProgress();
+    });
+  </script>
+  <!-- Підключення ресайзера H5P / Lumi -->
+  <script src="https://app.Lumi.education/api/v1/h5p/core/js/h5p-resizer.js" charset="UTF-8"></script>
+</body>
+</html>
